@@ -37,15 +37,16 @@
   }
 }
 
-.app-container {
+.app-container { /* everything */
   min-height: 100vh;
   background: linear-gradient(to bottom, #111827, #1f2937);
   color: white;
-  padding: 2rem;
+  padding: 0 2em 0 2em;
 }
 
-.content-container {
+.content-container { /* everything but under formatting */
   max-width: 56rem;
+  padding-top: 2em;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -53,7 +54,7 @@
   gap: 2rem;
 }
 
-.app-title {
+.app-title { /* "Movie Motivator" */
   font-size: 2.25rem;
   font-weight: bold;
   text-align: center;
@@ -64,13 +65,13 @@
   color: transparent;
 }
 
-.app-description {
+.app-description { /* "Enter a movie you want to discover similar movies to." */
   color: #d1d5db;
   text-align: center;
   margin-bottom: 2rem;
 }
 
-.search-container {
+.search-container { /* search bar + button */
   display: flex;
   gap: 0.75rem;
   width: 100%;
@@ -113,26 +114,20 @@
   box-shadow: 0 0 0 2px #111827, 0 0 0 4px #8b5cf6;
 }
 
-.recommendations-grid {
+.recommendations-grid { /* edit section */
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  width: 100%;
 }
 
-@media (min-width: 768px) {
-  .recommendations-grid {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-.movie-card {
+.movie-card { /* card formatting */
   background-color: #1f2937;
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #374151;
   transition: all 0.2s;
+  width: 100%;
 }
 
 .movie-card:hover {
@@ -150,7 +145,7 @@
   color: #a78bfa;
 }
 
-.video-placeholder {
+.video-placeholder { /* placeholder when youtube api off */
   width: 100%;
   aspect-ratio: 16 / 9;
   background-color: #374151;

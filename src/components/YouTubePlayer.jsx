@@ -13,8 +13,8 @@ function YouTubePlayer({ videoId }) {
     // Create a function to initialize this specific player
     const initPlayer = () => {
       new window.YT.Player(`youtube-player-${videoId}`, {
-        height: '390',
-        width: '640',
+        height: '250', // roughly 16:9
+        width: '400',
         videoId: videoId,
         playerVars: {
           'playsinline': 1

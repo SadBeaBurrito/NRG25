@@ -6,16 +6,17 @@ import YouTubePlayer from "./components/YouTubePlayer";
 import axios from "axios";
 
 function App() {
-  const USE_YOUTUBE_API = false; // Toggle this to true when you want to use YouTube API
+  const USE_YOUTUBE_API = true; // Toggle youtube api usage to save creds (True = on)
   const groq = new Groq({ apiKey: process.env.REACT_APP_API_KEY_GROQ, dangerouslyAllowBrowser: true });
   
-  
   async function getRecommendations(question) {
+    // func to ask groq for recomendations based off a previously enjoyed movie
     const chatCompletion = await getGroqChatCompletion(question);
+    // arranges response into array of movie titles
     const movieList = chatCompletion.choices[0]?.message?.content.split(',').map(movie => movie.trim());
-    console.log(movieList);
 
     if (USE_YOUTUBE_API) {
+      // search youtube for edits of each movie
       const moviesWithEdits = await Promise.all(
         movieList.map(async (movie) => {
           const videoId = await searchYoutube(movie);
@@ -27,6 +28,7 @@ function App() {
       );
       setRecommendations(moviesWithEdits);
     } else {
+      // if youtube api off, use only movie titles
       const moviesWithTitles = movieList.map(movie => ({
         title: movie,
         videoId: null
@@ -35,6 +37,7 @@ function App() {
     }
   }
 
+  // func searches youtube and returns vids of edits for a given movie
   async function searchYoutube(movieTitle) {
     if (!USE_YOUTUBE_API) return null;
     
@@ -42,7 +45,7 @@ function App() {
       const response = await axios.get(`https://www.googleapis.com/youtube/v3/search`, {
         params: {
           key: process.env.REACT_APP_API_KEY_YT,
-          q: `${movieTitle} edits`,
+          q: `${movieTitle} movie edits`,
           part: "snippet",
           maxResults: 1,
           type: "video",
@@ -55,15 +58,16 @@ function App() {
     }
   }
   
-  const [inputMovie, setInputMovie] = useState("");
-  const [recommendations, setRecommendations] = useState([]);
+  const [inputMovie, setInputMovie] = useState(""); // input field
+  const [recommendations, setRecommendations] = useState([]); // movie recommendations
 
+  // func asks llama to get movie recommendations with some output specifications
   async function getGroqChatCompletion(question) {
     return groq.chat.completions.create({
       messages: [
         {
           role: "user",
-          content: `Using ${question} as a reference, recommend 4 movies that would be recommended to someone who enjoyed ${question}. Format this as a string of 4 movie titles separated by commas. Do not include ${question} itself as a recommendation. If you do not recognize the title, return "unrecognized title"`,
+          content: `Using ${question} as a reference, recommend 4 movies that would be recommended to someone who enjoyed ${question}. Format this as a string of 4 movie titles separated by commas. Do not include ${question} itself as a recommendation. If you do not recognize the title, return "unrecognized title".`,
         },
       ],
       model: "llama-3.3-70b-versatile",
@@ -73,32 +77,36 @@ function App() {
   return (
     <div className="app-container">
       <div className="content-container">
-        {/* Header */}
+        {/* header */}
         <h1 className="app-title">
           Movie Motivator
         </h1>
         <p className="app-description">
-          Enter a movie you enjoy.
+          Enter a movie you want to discover similar movies to.
         </p>
 
-        {/* Search Section */}
+        {/* search bar + button */}
         <div className="search-container">
           <input
             type="text"
-            placeholder="Enter a movie you enjoyed..."
+            placeholder="Enter a movie..."
             value={inputMovie}
             onChange={(e) => setInputMovie(e.target.value)}
             className="search-input"
           />
           <button 
-            onClick={() => getRecommendations(inputMovie)}
+            onClick={() => {
+              if (inputMovie.trim()) {
+                getRecommendations(inputMovie)
+              }
+            }}
             className="search-button"
           >
             Search
           </button>
         </div>
 
-        {/* Recommendations Section */}
+        {/* edit output section */}
         {recommendations.length > 0 && (
           <div className="recommendations-grid">
             {recommendations.map((rec, index) => (
@@ -108,6 +116,7 @@ function App() {
               >
                 <div className="movie-content">
                   <h2 className="movie-title">{rec.title}</h2>
+                  {/* if youtube on, gets the vid display, otherwise placeholder */}
                   {USE_YOUTUBE_API && rec.videoId ? (
                     <YouTubePlayer videoId={rec.videoId}/>
                   ) : (
