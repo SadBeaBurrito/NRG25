@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-function YouTubePlayer({ videoId, title }) {
+function YouTubePlayer({ videoId }) {
   useEffect(() => {
     // Only load the script once
     if (!window.YT) {
